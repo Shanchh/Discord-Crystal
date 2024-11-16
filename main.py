@@ -127,10 +127,16 @@ async def deldetail(interaction: discord.Interaction, dataid: int):
     await interaction.response.send_message(embed = embed)
 
 @is_owner()
-@adminmonthly_group.command(name="active", description="列出所有活躍者")
+@adminmonthly_group.command(name="listdetails", description="列出所有訂閱明細")
 @app_commands.describe()
-async def listactive(interaction: discord.Interaction):
-    pass
+async def listalldetails(interaction: discord.Interaction):
+    db = Db_Client()
+    channel = interaction.channel
+    await interaction.response.send_message(embed=c_embed.basic("列出所有訂閱明細", "已收到請求！", 0x00ff11))
+    all_details = [db.get_detail(dataId) for dataId in db.get_all_detail_lists()]
+    for i in range(0, len(all_details), 5):
+        embed = await c_embed.listDetail_embed(bot, all_details[i:i+5], i)
+        await channel.send(embed = embed)
 
 def run_flask():
     flask_app = FlaskApp()

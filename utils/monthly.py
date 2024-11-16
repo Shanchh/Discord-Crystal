@@ -9,7 +9,7 @@ def check_subscriber_state(userId):
         if (data == False):
             return False
         if (len(data) == 1):
-            dateDeadLine = time_trans(data[0]["purchaseDate"]) + timedelta(days = data[0]["quantity"])
+            dateDeadLine = time_trans(data[0]["purchaseDate"]) + timedelta(days = data[0]["quantity"] * 30)
         for index in range(len(data) - 1):
             first_purchaseDate = time_trans(data[index]["purchaseDate"])
             second_purchaseDate = time_trans(data[index + 1]["purchaseDate"])
