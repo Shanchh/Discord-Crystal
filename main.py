@@ -20,8 +20,12 @@ bot = commands.Bot(
     owner_id=316548382308958208
 )
 
-monthly_group = app_commands.Group(name="monthly", description="管理月度訂閱")
+adminmonthly_group = app_commands.Group(name="adminmonthly", description="管理月度訂閱")
+monthly_group = app_commands.Group(name="monthly", description="訂閱查詢功能")
+bot.tree.add_command(adminmonthly_group)
 bot.tree.add_command(monthly_group)
+
+# ----- Basic -----
 
 @bot.event
 async def on_ready():
@@ -45,49 +49,8 @@ async def on_app_command_error(interaction: discord.Interaction, error: app_comm
         await interaction.response.send_message(embed = msg, ephemeral=True)
     else:
         raise error
-
-@is_owner()
-@monthly_group.command(name="adduser", description="新增訂閱者")
-@app_commands.describe(member = "@使用者")
-async def adduser(interaction: discord.Interaction, member:discord.Member):
-    db = Db_Client()
-    s = db.add_subscriber_user(member.id, member.name)
-    embed = c_embed.basic("新增訂閱者", "你已成功新增一名訂閱者", 0x00ff11) if s else c_embed.request_error("新增訂閱者")
-    await interaction.response.send_message(embed = embed)
-
-@is_owner()
-@monthly_group.command(name="adddetail", description="新增訂閱明細")
-@app_commands.describe(member = "@使用者", purchase_date = "購買日期", quantity = "數量", payment = "付款方式")
-@commands.has_permissions(administrator=True)
-async def adddetail(interaction: discord.Interaction, member: discord.Member, purchase_date: str, quantity: int, payment: str):
-    db = Db_Client()
-    s, dataId = db.add_subscriber_detail(member.id, member.name, purchase_date, quantity, payment)
-    embed = c_embed.basic("新增訂閱明細", f"你已成功新增一條明細,ID:{dataId}", 0x00ff11) if s else c_embed.request_error("新增訂閱明細")
-    await interaction.response.send_message(embed = embed)
-
-@is_owner()
-@monthly_group.command(name="deluser", description="刪除訂閱者")
-@app_commands.describe(member="@使用者")
-async def deluser(interaction: discord.Interaction, member:discord.Member):
-    db = Db_Client()
-    s = db.del_subscriber_user(member.id)
-    if s == None:
-        embed = c_embed.basic("刪除訂閱者", "查無此訂閱者", 0xffa82e)
-    else:
-        embed = c_embed.basic("刪除訂閱者", "你已成功刪除一位訂閱者", 0x00ff11) if s else c_embed.request_error("刪除訂閱者")
-    await interaction.response.send_message(embed = embed)
-
-@is_owner()
-@monthly_group.command(name="deldatail", description="刪除訂閱明細")
-@app_commands.describe(dataid="識別號碼")
-async def deldetail(interaction: discord.Interaction, dataid: int):
-    db = Db_Client()
-    s = db.del_subscriber_detail(dataid)
-    if s == None:
-        embed = c_embed.basic("刪除訂閱明細", "查無此訂閱明細", 0xffa82e)
-    else:
-        embed = c_embed.basic("刪除訂閱明細", "你已成功刪除一條訂閱明細", 0x00ff11) if s else c_embed.request_error("刪除訂閱明細")
-    await interaction.response.send_message(embed = embed)
+    
+# ----- Monthly ----- #
 
 @monthly_group.command(name="details", description="列出個人訂閱明細")
 @app_commands.describe()
@@ -102,17 +65,6 @@ async def listsubdetails(interaction: discord.Interaction):
         for count, data in enumerate(s):
             await interaction.channel.send(embed = c_embed.getDetail_info(count, data, author.avatar.url))
 
-@is_owner()
-@monthly_group.command(name="listdetails", description="列出所有訂閱明細")
-@app_commands.describe()
-async def listalldetails(interaction: discord.Interaction):
-    db = Db_Client()
-    channel = interaction.channel
-    await interaction.response.send_message(embed=c_embed.basic("列出所有訂閱明細", "已收到請求！", 0x00ff11))
-    all_details = [db.get_detail(dataId) for dataId in db.get_all_detail_lists()]
-    for i in range(0, len(all_details), 5):
-        embed = await c_embed.listDetail_embed(bot, all_details[i:i+5], i)
-        await channel.send(embed = embed)
 
 @monthly_group.command(name="check", description="確認個人訂閱狀態")
 @app_commands.describe()
@@ -129,8 +81,53 @@ async def checkstatus(interaction: discord.Interaction):
         formatted_date = dateDeadLine.strftime("%Y-%m-%d")
         await interaction.response.send_message(embed = c_embed.checkstatus(f"您目前在訂閱期間！ 期限至: {formatted_date}", 0x00ff11, author.avatar.url))
 
+# ----- AdminMonthly ----- #
+
 @is_owner()
-@monthly_group.command(name="active", description="列出所有活躍者")
+@adminmonthly_group.command(name="adduser", description="新增訂閱者")
+@app_commands.describe(member = "@使用者")
+async def adduser(interaction: discord.Interaction, member:discord.Member):
+    db = Db_Client()
+    s = db.add_subscriber_user(member.id, member.name)
+    embed = c_embed.basic("新增訂閱者", "你已成功新增一名訂閱者", 0x00ff11) if s else c_embed.request_error("新增訂閱者")
+    await interaction.response.send_message(embed = embed)
+
+@is_owner()
+@adminmonthly_group.command(name="adddetail", description="新增訂閱明細")
+@app_commands.describe(member = "@使用者", purchase_date = "購買日期", quantity = "數量", payment = "付款方式")
+@commands.has_permissions(administrator=True)
+async def adddetail(interaction: discord.Interaction, member: discord.Member, purchase_date: str, quantity: int, payment: str):
+    db = Db_Client()
+    s, dataId = db.add_subscriber_detail(member.id, member.name, purchase_date, quantity, payment)
+    embed = c_embed.basic("新增訂閱明細", f"你已成功新增一條明細,ID:{dataId}", 0x00ff11) if s else c_embed.request_error("新增訂閱明細")
+    await interaction.response.send_message(embed = embed)
+
+@is_owner()
+@adminmonthly_group.command(name="deluser", description="刪除訂閱者")
+@app_commands.describe(member="@使用者")
+async def deluser(interaction: discord.Interaction, member:discord.Member):
+    db = Db_Client()
+    s = db.del_subscriber_user(member.id)
+    if s == None:
+        embed = c_embed.basic("刪除訂閱者", "查無此訂閱者", 0xffa82e)
+    else:
+        embed = c_embed.basic("刪除訂閱者", "你已成功刪除一位訂閱者", 0x00ff11) if s else c_embed.request_error("刪除訂閱者")
+    await interaction.response.send_message(embed = embed)
+
+@is_owner()
+@adminmonthly_group.command(name="deldatail", description="刪除訂閱明細")
+@app_commands.describe(dataid="識別號碼")
+async def deldetail(interaction: discord.Interaction, dataid: int):
+    db = Db_Client()
+    s = db.del_subscriber_detail(dataid)
+    if s == None:
+        embed = c_embed.basic("刪除訂閱明細", "查無此訂閱明細", 0xffa82e)
+    else:
+        embed = c_embed.basic("刪除訂閱明細", "你已成功刪除一條訂閱明細", 0x00ff11) if s else c_embed.request_error("刪除訂閱明細")
+    await interaction.response.send_message(embed = embed)
+
+@is_owner()
+@adminmonthly_group.command(name="active", description="列出所有活躍者")
 @app_commands.describe()
 async def listactive(interaction: discord.Interaction):
     pass
