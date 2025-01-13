@@ -62,7 +62,7 @@ class Db_Client:
             return False
         
     # 新增訂閱資料
-    def add_subscriber_detail(self, userId, userName, purchaseDate, quantity, payment):
+    def add_subscriber_detail(self, userId, userName, purchaseDate, quantity, payment, amount):
         try:
             # 確認是否註冊過
             user_doc = self.db.collection("subscriber_users").document(str(userId)).get()
@@ -76,7 +76,8 @@ class Db_Client:
                 "userName": userName,
                 "purchaseDate": purchaseDate,
                 "quantity": quantity,
-                "payment": payment
+                "payment": payment,
+                "amount": amount
             }
             ref = self.db.collection("subscriber_users").document(str(userId)).collection("Details").document(str(dataId))
             ref.set(data)

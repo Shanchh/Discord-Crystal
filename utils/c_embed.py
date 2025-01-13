@@ -53,3 +53,18 @@ def checkstatus(content, color, avatar):
     embed.set_thumbnail(url = avatar)
     embed.color = color
     return embed
+
+def active_result(count, uncount, guild_avatar):
+    embed = basic("活躍用戶總計", f"目前活躍用戶數量: {count}\n非活躍用戶數量: {uncount}", 0xac21de)
+    embed.set_thumbnail(url = guild_avatar)
+    return embed
+
+def active_user(count, user_mention, dateDeadLine, avatar):
+    embed = basic(f"第{count + 1}名", f"訂閱者: {user_mention}\n訂閱到期日: {dateDeadLine}", 0x6077e6)
+    embed.set_thumbnail(url = avatar)
+    return embed
+    
+def statistics(quantity, amount, avatar):
+    embed = basic("總計月數金額", f"總月數: {quantity}\n總金額: {amount}", 0x72fde1)
+    embed.set_thumbnail(url = avatar)
+    return embed

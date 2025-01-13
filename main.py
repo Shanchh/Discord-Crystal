@@ -1,13 +1,11 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
-from discord.ext.commands import has_permissions
 import threading
 import configparser
 from app import FlaskApp
 from utils import c_embed, monthly
 from utils.firebase_db import Db_Client
-
 
 config = configparser.ConfigParser()
 config.read('setting/botToken.ini')
@@ -65,7 +63,6 @@ async def listsubdetails(interaction: discord.Interaction):
         for count, data in enumerate(s):
             await interaction.channel.send(embed = c_embed.getDetail_info(count, data, author.avatar.url))
 
-
 @monthly_group.command(name="check", description="確認個人訂閱狀態")
 @app_commands.describe()
 async def checkstatus(interaction: discord.Interaction):
@@ -94,11 +91,11 @@ async def adduser(interaction: discord.Interaction, member:discord.Member):
 
 @is_owner()
 @adminmonthly_group.command(name="adddetail", description="新增訂閱明細")
-@app_commands.describe(member = "@使用者", purchase_date = "購買日期", quantity = "數量", payment = "付款方式")
+@app_commands.describe(member = "@使用者", purchase_date = "購買日期", quantity = "數量", payment = "付款方式", amount = "金額")
 @commands.has_permissions(administrator=True)
-async def adddetail(interaction: discord.Interaction, member: discord.Member, purchase_date: str, quantity: int, payment: str):
+async def adddetail(interaction: discord.Interaction, member: discord.Member, purchase_date: str, quantity: int, payment: str, amount: int):
     db = Db_Client()
-    s, dataId = db.add_subscriber_detail(member.id, member.name, purchase_date, quantity, payment)
+    s, dataId = db.add_subscriber_detail(member.id, member.name, purchase_date, quantity, payment, amount)
     embed = c_embed.basic("新增訂閱明細", f"你已成功新增一條明細,ID:{dataId}", 0x00ff11) if s else c_embed.request_error("新增訂閱明細")
     await interaction.response.send_message(embed = embed)
 
@@ -137,6 +134,41 @@ async def listalldetails(interaction: discord.Interaction):
     for i in range(0, len(all_details), 5):
         embed = await c_embed.listDetail_embed(bot, all_details[i:i+5], i)
         await channel.send(embed = embed)
+
+@is_owner()
+@adminmonthly_group.command(name="active", description="列出所有活躍者")
+@app_commands.describe()
+async def listactive(interaction: discord.Interaction):
+    db = Db_Client()
+    result = []
+    userList = db.get_all_subscriber_user()
+    for userId in userList:
+        s, dateDeadLine = monthly.check_subscriber_state(userId)
+        if dateDeadLine:
+            result.append({
+                "userId": userId,
+                "dateDeadLine": dateDeadLine
+            })
+    await interaction.response.send_message(embed = c_embed.active_result(len(result), len(userList) - len(result), interaction.guild.icon.url))
+    for count, active in enumerate(result):
+        user = await interaction.client.fetch_user(active["userId"])
+        await interaction.channel.send(embed = c_embed.active_user(count, user.mention, active["dateDeadLine"].strftime("%Y-%m-%d"), user.avatar.url))
+
+@is_owner()
+@adminmonthly_group.command(name="checkexisting", description="核實身分組存在狀況")
+@app_commands.describe()
+async def check_existing(interaction: discord.Interaction, role:discord.Role):
+    userList = discord.utils.get(interaction.guild.roles, name = "🚉《高速列申方案訂閱中》").members
+
+@is_owner()
+@adminmonthly_group.command(name="statistics", description="總計月數金額")
+@app_commands.describe()
+async def statistics(interaction: discord.Interaction):
+    db = Db_Client()    
+    all_details = list(db.get_detail(dataId) for dataId in db.get_all_detail_lists())
+    quantity = sum(detail["quantity"] for detail in all_details)
+    amount = sum(detail["amount"] for detail in all_details)
+    await interaction.response.send_message(embed = c_embed.statistics(quantity, amount, interaction.guild.icon.url), ephemeral=True)
 
 def run_flask():
     flask_app = FlaskApp()
