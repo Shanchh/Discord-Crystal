@@ -1,8 +1,8 @@
 from utils.firebase_db import Db_Client
 from datetime import date, datetime, timedelta
 
-# 檢查個人訂閱狀態
 def check_subscriber_state(userId):
+    """檢查個人訂閱狀態"""
     try:
         db = Db_Client()
         data = db.list_subscriber_details(userId)
@@ -25,8 +25,8 @@ def check_subscriber_state(userId):
         print(f"檢查個人訂閱狀態時發生錯誤: {e}")
         return False, None
 
-# 日期字串轉換系統時間
 def time_trans(time):
+    """日期字串轉換系統時間"""
     return datetime.strptime(time, "%Y/%m/%d")
 
 if __name__ == "__main__":

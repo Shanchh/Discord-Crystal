@@ -10,8 +10,8 @@ class Db_Client:
             firebase_admin.initialize_app(cred)
         self.db = firestore.client()
     
-    # 查詢所有訂閱者資料
     def get_all_subscriber_user(self):
+        """查詢所有訂閱者資料"""
         try:
             result = []
             ref = self.db.collection("subscriber_users")
@@ -23,8 +23,8 @@ class Db_Client:
             print(f"查詢所有訂閱者時發生錯誤: {e}")
             return False
         
-    # 查詢所有訂閱購買資料
     def get_all_detail_lists(self):
+        """查詢所有訂閱購買資料"""
         try:
             result = []
             ref = self.db.collection("detail_lists")
@@ -36,8 +36,8 @@ class Db_Client:
             print(f"查詢所有訂閱購買資料時發生錯誤: {e}")
             return False
 
-    # 新增訂閱者資料
     def add_subscriber_user(self, userId, userName):
+        """新增訂閱者資料"""
         try:
             ref = self.db.collection("subscriber_users").document(str(userId))
             ref.set({
@@ -49,8 +49,8 @@ class Db_Client:
             print(f"新增訂閱者時發生錯誤: {e}")
             return False
     
-    # 刪除指定訂閱者資料
     def del_subscriber_user(self, userId):
+        """刪除指定訂閱者資料"""
         try:
             ref = self.db.collection("subscriber_users").document(str(userId))
             data = ref.get().to_dict()
@@ -61,8 +61,8 @@ class Db_Client:
             print(f"刪除訂閱者時發生錯誤: {e}")
             return False
         
-    # 新增訂閱資料
     def add_subscriber_detail(self, userId, userName, purchaseDate, quantity, payment, amount):
+        """新增訂閱資料"""
         try:
             # 確認是否註冊過
             user_doc = self.db.collection("subscriber_users").document(str(userId)).get()
@@ -88,8 +88,8 @@ class Db_Client:
             print(f"新增訂閱資料時發生錯誤: {e}")
             return False, ""
 
-    # 刪除訂閱資料
     def del_subscriber_detail(self, dataId):
+        """刪除訂閱資料"""
         try:
             ref = self.db.collection("detail_lists").document(str(dataId))
             data = ref.get().to_dict()
@@ -105,8 +105,8 @@ class Db_Client:
             print(f"刪除訂閱資料時發生錯誤: {e}")
             return False
 
-    # 列出個人購買明細 
     def list_subscriber_details(self, userId):
+        """列出個人購買明細"""
         try:
             # 確認是否註冊過
             user_doc = self.db.collection("subscriber_users").document(str(userId)).get()
@@ -123,8 +123,8 @@ class Db_Client:
             print(f"列出個人購買明細時發生錯誤: {e}")
             return False
     
-    # 查詢特定購買明細
     def get_detail(self, dataId):
+        """查詢特定購買明細"""
         try:
             ref = self.db.collection("detail_lists").document(str(dataId))
             data = ref.get().to_dict()

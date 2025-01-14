@@ -17,6 +17,6 @@ class FlaskApp:
     def run(self, host="0.0.0.0", port=5000):
             self.app.run(host = host, port = port)
 
-if __name__ == '__main__':
-    app = FlaskApp()
-    app.run()
+def run_flask():
+    flask_app = FlaskApp()
+    flask_app.run(host="127.0.0.1", port=6620)
