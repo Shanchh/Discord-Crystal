@@ -1,11 +1,17 @@
 from discord_embed import init, basic
+from datetime import datetime
 
 async def listDetail_embed(bot, dataList, count):
     embed = init()
     embed.title = f"總明細查詢:第{count + 1}筆至第{count + len(dataList)}筆"
     for index, data in enumerate(dataList):
-        user = await bot.fetch_user(data["userId"])
-        embed.add_field(name = f"{count + index + 1}.識別編號:{data['dataId']}", value = f"訂閱者: {user.mention}，訂閱日期: {data['purchaseDate']}\n數量: {data['quantity']}，購買方式: {data['payment']}", inline = False)
+        user = await bot.fetch_user(data["discord_id"])
+        date = datetime.fromtimestamp(data["createAt"]).strftime('%Y-%m-%d')
+        embed.add_field(
+            name = f"{count + index + 1}.識別編號:{str(data['_id'])}",
+            value = f"訂閱者: {user.mention}，訂閱日期: {date}\n數量: {data['quantity']}，購買方式: {data['payment']}",
+            inline = False
+        )
     embed.color = 0xf0e033
     return embed
 
@@ -18,8 +24,8 @@ def getDetail_embed(avatar):
 
 def getDetail_info(count, data, avatar):
     embed = init()
-    embed.title = f"第 {count + 1} 筆訂閱明細: {data['dataId']}" + "\u3000" * 10
-    embed.add_field(name="📅 訂閱日期", value=data["purchaseDate"], inline=True)
+    embed.title = f"第 {count + 1} 筆訂閱明細: {data['_id']}" + "\u3000" * 10
+    embed.add_field(name="📅 訂閱日期", value=data["createAt"], inline=True)
     embed.add_field(name="🗓️ 月數", value=data["quantity"], inline=True)
     embed.add_field(name="💳 訂閱方式", value=data["payment"], inline=True)
     embed.set_thumbnail(url = avatar)

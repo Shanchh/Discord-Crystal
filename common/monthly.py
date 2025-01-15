@@ -1,7 +1,7 @@
 import time
 from bson import ObjectId
 
-from utils.firebase_db import Db_Client
+from my_utils import time_trans
 from datetime import date, datetime, timedelta
 from setting.mongodb_setting import db
 
@@ -30,6 +30,7 @@ def get_all_detail_lists():
 def add_subscriber_user(userId, userName):
     """新增訂閱者資料"""
     try:
+        userId = str(userId)
         collection = db["Monthly-Users"]
         
         user = collection.find_one({"discord_id": userId})
@@ -52,6 +53,7 @@ def add_subscriber_user(userId, userName):
 def del_subscriber_user(userId):
     """刪除指定訂閱者資料"""
     try:
+        userId = str(userId)
         collection = db["Monthly-Users"]
 
         user = collection.find_one({"discord_id": userId})
@@ -66,6 +68,7 @@ def del_subscriber_user(userId):
 def add_subscriber_detail(userId, userName, purchaseDate, quantity, payment, amount):
     """新增訂閱資料"""
     try:
+        userId = str(userId)
         collection = db["Monthly-Users"]
 
         user = collection.find_one({"discord_id": userId})
@@ -83,7 +86,7 @@ def add_subscriber_detail(userId, userName, purchaseDate, quantity, payment, amo
         }
         result = collection.insert_one(insert_data)
 
-        return True, result
+        return True, str(result.inserted_id)
     except Exception as e:
         print(f"新增訂閱資料時發生錯誤: {e}")
         return False, ""
@@ -105,13 +108,18 @@ def del_subscriber_detail(dataId):
 def list_subscriber_details(userId):
     """列出個人購買明細"""
     try:
+        userId = str(userId)
         collection = db["Monthly-Users"]
-
+        
         user = collection.find_one({"discord_id": userId})
         if not user: return None
-
+        
         collection = db["Monthly-Details"]
         user_details = list(collection.find({"discord_id": userId}))
+
+        for detail in user_details:
+            detail["_id"] = str(detail["_id"])
+            detail["createAt"] = datetime.fromtimestamp(detail["createAt"]).strftime('%Y-%m-%d')
         
         return user_details if user_details else None
     except Exception as e:
@@ -133,6 +141,7 @@ def get_detail(dataId):
 def check_subscriber_state(userId):
     """檢查個人訂閱狀態"""
     try:
+        userId = str(userId)
         data = list_subscriber_details(userId)
         if not data:
             return None, None
@@ -152,10 +161,29 @@ def check_subscriber_state(userId):
     except Exception as e:
         print(f"檢查個人訂閱狀態時發生錯誤: {e}")
         return False, None
+    
+def get_statistics():
+    """獲取總統計數據 月數、金額"""
+    try:
+        collection = db["Monthly-Details"]
+        pipeline = [
+            {
+                "$group": {
+                    "_id": None,
+                    "totalAmount": {"$sum": "$amount"},
+                    "totalQuantity": {"$sum": "$quantity"}
+                }
+            }
+        ]
+        result = list(collection.aggregate(pipeline))
 
-def time_trans(timestamp):
-    """將時間戳轉換為系統時間"""
-    return datetime.fromtimestamp(timestamp)
+        total_amount = result[0].get("totalAmount")
+        total_quantity = result[0].get("totalQuantity")
+
+        return total_amount, total_quantity
+    except Exception as e:
+        print(f"獲取總統計數據時發生錯誤: {e}")
+        return False, False
 
 def objectid_trans_string(data_list):
     for data in data_list:
