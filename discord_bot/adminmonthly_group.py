@@ -7,6 +7,8 @@ import common.monthly as monthly
 import discord_embed.basic_embed as bm
 import discord_embed.monthly_embed as mm
 
+MONTHLY_ROLE_ID = 969780381391929345
+
 adminmonthly_group = app_commands.Group(name="adminmonthly", description="管理月度訂閱")
 
 @is_owner()
@@ -21,9 +23,19 @@ async def adduser(interaction: discord.Interaction, member:discord.Member):
 @adminmonthly_group.command(name="adddetail", description="新增訂閱明細")
 @app_commands.describe(member = "@使用者", purchase_date = "購買日期", quantity = "數量", payment = "付款方式", amount = "金額")
 async def adddetail(interaction: discord.Interaction, member: discord.Member, purchase_date: str, quantity: int, payment: str, amount: int):
-    s, dataId = monthly.add_subscriber_detail(member.id, member.name, purchase_date, quantity, payment, amount)
+    userId = member.id
+    s, dataId = monthly.add_subscriber_detail(userId, member.name, purchase_date, quantity, payment, amount)
     embed = bm.basic("新增訂閱明細", f"你已成功新增一條明細,ID:{dataId}", 0x00ff11) if s else bm.request_error("新增訂閱明細")
     await interaction.response.send_message(embed = embed)
+    active, _ = monthly.check_subscriber_state(userId)
+    if active:
+        try:
+            guild = interaction.guild
+            role = guild.get_role(MONTHLY_ROLE_ID)
+            await member.add_roles(role)
+            await interaction.followup.send(embed = bm.basic("添加身分組", "執行成功", 0x00ff11))
+        except discord.HTTPException as e:
+            await interaction.followup.send(embed = bm.request_error(f"添加角色時發生錯誤: {e}", ephemeral=True))
 
 @is_owner()
 @adminmonthly_group.command(name="deluser", description="刪除訂閱者")
