@@ -85,8 +85,29 @@ async def listactive(interaction: discord.Interaction):
 @is_owner()
 @adminmonthly_group.command(name="checkexisting", description="核實身分組存在狀況")
 @app_commands.describe()
-async def check_existing(interaction: discord.Interaction, role: discord.Role):
-    userList = discord.utils.get(interaction.guild.roles, name = "🚉《高速列申方案訂閱中》").members
+async def check_existing(interaction: discord.Interaction):
+    await interaction.response.send_message(embed=bm.basic("核實身分組存在狀況", "已收到請求！", 0x00ff11))
+    guild = interaction.guild
+    channel = interaction.channel
+    role = guild.get_role(MONTHLY_ROLE_ID)
+    
+    # 檢查持有身分組的用戶
+    members_with_role = role.members
+    for member in members_with_role:
+        active, dead_line = monthly.check_subscriber_state(member.id)
+        if not active:
+            await member.remove_roles(role)
+            await channel.send(embed = bm.basic("刪除過期訂閱者", f"用戶: {member.mention}\n到期時間: {dead_line}", 0xe63333))
+
+    # 檢查活躍中缺失身分組的用戶
+    active_members = monthly.get_active_user()
+    for member in active_members:
+        member = guild.get_member(member["userId"])
+        if member and role not in member.roles:
+            await member.add_roles(role)
+            await channel.send(embed = bm.basic("添加缺失身分組", f"已為活躍用戶 {member.mention} 添加角色 '{role.name}'\n到期日: {member['dateDeadLine']}", 0x00ff11))
+
+    await channel.send(embed = bm.basic("核實身分組存在狀況", "執行完畢！", 0x00ff11))
 
 @is_owner()
 @adminmonthly_group.command(name="statistics", description="總計月數金額")
