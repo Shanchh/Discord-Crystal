@@ -63,17 +63,8 @@ async def listalldetails(interaction: discord.Interaction):
 @app_commands.describe()
 async def listactive(interaction: discord.Interaction):
     await interaction.response.send_message(embed=bm.basic("列出所有訂閱明細", "已收到請求！", 0x00ff11))
-    result = []
-    userList = monthly.get_all_subscriber_user()
-    for user in userList:
-        userId = user["discord_id"]
-        isActive, dateDeadLine = monthly.check_subscriber_state(userId)
-        if isActive:
-            result.append({
-                "userId": userId,
-                "dateDeadLine": dateDeadLine
-            })
-    await interaction.channel.send(embed = mm.active_result(len(result), len(userList) - len(result), interaction.guild.icon.url))
+    result = monthly.get_active_user()
+    await interaction.channel.send(embed = mm.active_result(len(result), interaction.guild.icon.url))
     for count, active in enumerate(result):
         user = await interaction.client.fetch_user(active["userId"])
         avatar_url = user.avatar.url if user.avatar else user.default_avatar.url

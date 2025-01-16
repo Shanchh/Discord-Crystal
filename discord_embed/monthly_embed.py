@@ -40,8 +40,8 @@ def checkstatus(content, color, avatar):
     embed.color = color
     return embed
 
-def active_result(count, uncount, guild_avatar):
-    embed = basic("活躍用戶總計", f"目前活躍用戶數量: {count}\n非活躍用戶數量: {uncount}", 0xac21de)
+def active_result(count, guild_avatar):
+    embed = basic("活躍用戶總計", f"目前活躍用戶數量: {count}", 0xac21de)
     embed.set_thumbnail(url = guild_avatar)
     return embed
 

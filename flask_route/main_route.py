@@ -1,22 +1,16 @@
 from flask import Flask
 
-class FlaskApp:
-    def __init__(self):
-        self.app = Flask(__name__)
-        self.setup_routes()
-    
-    def setup_routes(self):
-        @self.app.route('/')
-        def home():
-            return "歡迎來到 Flask 應用!"
+from flask_route.monthly_route import monthly_api
 
-        @self.app.route('/about')
-        def about():
-            return "這是關於頁面！"
-    
-    def run(self, host="0.0.0.0", port=5000):
-            self.app.run(host = host, port = port)
+app = Flask(__name__)
+app.secret_key = "9999"
+port = 6620
 
-def run_flask():
-    flask_app = FlaskApp()
-    flask_app.run(host="127.0.0.1", port=6620)
+@app.route("/test", methods=["GET", "POST"])
+def test_api():
+    result = {
+        "message": "ok",
+    }
+    return result
+
+app.register_blueprint(monthly_api, url_prefix="/monthly")

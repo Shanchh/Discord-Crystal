@@ -1,1 +1,1 @@
-from .main_route import run_flask
+from .main_route import app

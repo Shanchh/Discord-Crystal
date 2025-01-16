@@ -184,6 +184,20 @@ def get_statistics():
     except Exception as e:
         print(f"獲取總統計數據時發生錯誤: {e}")
         return False, False
+    
+def get_active_user():
+    """列出活躍訂閱者"""
+    result = []
+    userList = get_all_subscriber_user()
+    for user in userList:
+        userId = user["discord_id"]
+        isActive, dateDeadLine = check_subscriber_state(userId)
+        if isActive:
+            result.append({
+                "userId": userId,
+                "dateDeadLine": dateDeadLine
+            })
+    return result
 
 def objectid_trans_string(data_list):
     for data in data_list:
