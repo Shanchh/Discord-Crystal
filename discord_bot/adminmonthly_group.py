@@ -115,3 +115,18 @@ async def check_existing(interaction: discord.Interaction):
 async def statistics(interaction: discord.Interaction):
     total_amount, total_quantity = monthly.get_statistics()
     await interaction.response.send_message(embed = mm.statistics(total_quantity, total_amount, interaction.guild.icon.url), ephemeral=True)
+
+@is_owner()
+@adminmonthly_group.command(name="userdetails", description="查詢單一訂閱者的詳細訂閱資訊")
+@app_commands.describe(member="@使用者")
+async def userdetails(interaction: discord.Interaction, member: discord.Member):
+    user_details = monthly.list_subscriber_details(member.id)
+    if not user_details:
+        embed = bm.basic("查詢訂閱者明細", "該用戶無任何訂閱資料", 0xffa82e)
+        await interaction.response.send_message(embed = embed)
+        return
+    
+    avatar_url = member.avatar.url if member.avatar else member.default_avatar.url
+    for count, detail in enumerate(user_details):
+        await interaction.channel.send(embed=mm.getDetail_info(count, detail, avatar_url))
+    await interaction.response.send_message(embed=bm.basic("查詢訂閱者明細", f"已列出 {member.mention} 的所有訂閱明細！", 0x00ff11))
