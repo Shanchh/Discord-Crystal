@@ -15,7 +15,8 @@ adminmonthly_group = app_commands.Group(name="adminmonthly", description="管理
 @adminmonthly_group.command(name="adduser", description="新增訂閱者")
 @app_commands.describe(member = "@使用者")
 async def adduser(interaction: discord.Interaction, member:discord.Member):
-    s = monthly.add_subscriber_user(member.id, member.name)
+    avatar_url = member.avatar.url if member.avatar else member.default_avatar.url
+    s = monthly.add_subscriber_user(member.id, member.name, avatar_url)
     embed = bm.basic("新增訂閱者", "你已成功新增一名訂閱者", 0x00ff11) if s else bm.request_error("新增訂閱者")
     await interaction.response.send_message(embed = embed)
 
@@ -24,7 +25,8 @@ async def adduser(interaction: discord.Interaction, member:discord.Member):
 @app_commands.describe(member = "@使用者", purchase_date = "購買日期", quantity = "數量", payment = "付款方式", amount = "金額")
 async def adddetail(interaction: discord.Interaction, member: discord.Member, purchase_date: str, quantity: int, payment: str, amount: int):
     userId = member.id
-    s, dataId = monthly.add_subscriber_detail(userId, member.name, purchase_date, quantity, payment, amount)
+    avatar_url = member.avatar.url if member.avatar else member.default_avatar.url
+    s, dataId = monthly.add_subscriber_detail(userId, member.name, avatar_url, purchase_date, quantity, payment, amount)
     embed = bm.basic("新增訂閱明細", f"你已成功新增一條明細,ID:{dataId}", 0x00ff11) if s else bm.request_error("新增訂閱明細")
     await interaction.response.send_message(embed = embed)
     active, _ = monthly.check_subscriber_state(userId)

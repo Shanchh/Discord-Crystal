@@ -27,7 +27,7 @@ def get_all_detail_lists():
         print(f"查詢所有訂閱者時發生錯誤: {e}")
         return False
     
-def add_subscriber_user(userId, userName):
+def add_subscriber_user(userId, userName, user_avatar):
     """新增訂閱者資料"""
     try:
         userId = str(userId)
@@ -39,10 +39,9 @@ def add_subscriber_user(userId, userName):
         user_data = {
             "discord_id": userId,
             "discord_name": userName,
-            "sub_months": 0,
-            "sub_data_ids": [],
             "createAt": int(time.time()),
-            "is_active": False
+            "is_active": False,
+            "avatar": user_avatar
         }
         collection.insert_one(user_data)
         return True
@@ -65,7 +64,7 @@ def del_subscriber_user(userId):
         print(f"刪除訂閱者時發生錯誤: {e}")
         return False
     
-def add_subscriber_detail(userId, userName, purchaseDate, quantity, payment, amount):
+def add_subscriber_detail(userId, userName, user_avatar, purchaseDate, quantity, payment, amount):
     """新增訂閱資料"""
     try:
         userId = str(userId)
@@ -73,7 +72,7 @@ def add_subscriber_detail(userId, userName, purchaseDate, quantity, payment, amo
 
         user = collection.find_one({"discord_id": userId})
         if not user:
-            add_subscriber_user(userId, userName)
+            add_subscriber_user(userId, userName, user_avatar)
 
         collection = db["Monthly-Details"]
         insert_data = {
