@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/logo.jpg" alt="Discord-Crystal Logo" width="300" style="border-radius: 10px;">
+  <img src="public/assets/logo.png" alt="Discord-Crystal Logo" width="300">
 </p>
 
 # Discord-Crystal

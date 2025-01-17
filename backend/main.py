@@ -1,13 +1,8 @@
-import configparser
 import threading
 
 from discord_bot.main_bot import bot
 from flask_route import app
-
-config = configparser.ConfigParser()
-config.read('setting/botToken.ini')
-
-botToken = config['setting']['botToken']
+from setting.token import botToken
 
 def run_flask():
     app.run(host="127.0.0.1", port=6620)
