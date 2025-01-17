@@ -19,9 +19,9 @@ const MainHeader = () => {
             borderBottom: '2px solid #ffffff',
             padding: '0',
         }}>
-            <Flex gap={5} justify='start' align='center' style={{ marginLeft: 13 }}>
+            <Flex gap={5} justify='start' align='center' style={{ marginLeft: 10 }}>
                 <img src='assets/logo.png' style={{ height: 30 }}></img>
-                <span onClick={navigateToHome} style={{ fontSize: 34, fontWeight: 'bold', fontFamily: "Lucida Console, 微軟正黑體, 新細明體, sans-serif" }}>Crystal</span>
+                <span onClick={navigateToHome} style={{ fontSize: 34, fontWeight: 'bold', fontFamily: "Lucida Console, 微軟正黑體, 新細明體, sans-serif" }}>CRYSTAL</span>
             </Flex>
         </Header>
     )
