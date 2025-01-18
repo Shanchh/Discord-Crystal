@@ -4,7 +4,9 @@
 
 # Discord-Crystal
 
-[![Python](https://img.shields.io/badge/Python-3.9%2B-blue)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.11.8%2B-orange)](https://www.python.org/)
+[![React](https://img.shields.io/badge/React-18.3.1-blue)](https://reactts.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-4.9.5%2B-%2300BFFF)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/github/license/Shanchh/Discord-Crystal)](LICENSE)
 
 ---
