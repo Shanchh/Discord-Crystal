@@ -16,3 +16,16 @@ def get_all_subscriber_user():
 
     except Exception as e:
         return jsonify({"Error": str(e)}), 404
+    
+@monthly_api.route("/get_all_detail_lists", methods=["GET"])
+def get_all_detail_lists():
+    try:
+        detail_list = monthly.get_all_detail_lists()
+        result = {
+            "message": "ok",
+            "data": detail_list[::-1]
+        }
+        return result
+
+    except Exception as e:
+        return jsonify({"Error": str(e)}), 404

@@ -78,6 +78,7 @@ def add_subscriber_detail(userId, userName, user_avatar, purchaseDate, quantity,
         insert_data = {
             "discord_id": str(userId),
             "discord_name": userName,
+            "avatar": user_avatar,
             "createAt": int(datetime.strptime(purchaseDate, "%Y/%m/%d").timestamp()),
             "amount": amount,
             "quantity": quantity,
