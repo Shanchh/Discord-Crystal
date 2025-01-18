@@ -1,5 +1,8 @@
-from flask import jsonify, Blueprint
+from flask import jsonify, Blueprint, request
+from datetime import datetime
+from bson import ObjectId
 
+from setting.mongodb_setting import db
 import common.monthly as monthly
 
 monthly_api = Blueprint("monthly_api", __name__)
@@ -24,6 +27,31 @@ def get_all_detail_lists():
         result = {
             "message": "ok",
             "data": detail_list[::-1]
+        }
+        return result
+
+    except Exception as e:
+        return jsonify({"Error": str(e)}), 404
+    
+@monthly_api.route("/modify_detail", methods=["POST"])
+def modify_detail():
+    try:
+        data: dict = request.get_json()
+        values = data["values"]
+        query = {"_id": ObjectId(values["_id"])}
+        update = {
+            "$set": {
+                "discord_name": values["name"],
+                "createAt": int(datetime.strptime(values["createTime"], "%Y-%m-%d").timestamp()),
+                "amount": int(values["amount"]),
+                "quantity": int(values["quantity"]),
+                "payment": int(values["payment"])
+            }
+        }
+        modify_result = db["Monthly-Details"].update_one(query, update)
+        result = {
+            "message": "ok",
+            "modify": modify_result.modified_count
         }
         return result
 

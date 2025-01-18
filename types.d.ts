@@ -8,3 +8,12 @@ export interface Detail {
     quantity: number,
     payment: string,
 }
+
+export interface DetailModify {
+    _id: string;
+    name: string;
+    createTime: string;
+    payment: string;
+    quantity: string;
+    amount: string;
+}

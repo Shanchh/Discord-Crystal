@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { get_all_detail_lists } from '../../Api/HandleApi';
-import { Detail } from '../../../types'
+import { Detail, DetailModify } from '../../../types'
 import DetailTable from '../../Component/DetailsTable';
 import { ReloadOutlined, UserOutlined, SearchOutlined, IdcardOutlined } from '@ant-design/icons';
 import { Button, Col, DatePicker, Flex, Form, Input, Radio, Row, Select } from 'antd';
@@ -66,7 +66,7 @@ const DetailManage = () => {
 
   const handleTypeChange = (value: string) => {
     setSelectType(value);
-  
+
     if (value === 'none') {
       setSelectSorterOption(NoneSorterOption);
     } else if (value === 'createAt') {
@@ -85,41 +85,58 @@ const DetailManage = () => {
 
   function getMonthTimestamps(now: any) {
     const validDate = now?.toDate ? now.toDate() : now instanceof Date ? now : new Date();
-  
+
     const startOfMonth = Math.floor(new Date(validDate.getFullYear(), validDate.getMonth(), 1).getTime() / 1000);
     const endOfMonth = Math.floor((new Date(validDate.getFullYear(), validDate.getMonth() + 1, 1).getTime() - 1) / 1000);
-  
+
     return { startOfMonth, endOfMonth };
   }
 
   const onSubmit = (values: Filter) => {
     setSearchLoading(true);
     const { id, name, payment, createMonth } = values;
-  
+
     const { startOfMonth, endOfMonth } = createMonth
       ? getMonthTimestamps(createMonth)
       : { startOfMonth: 0, endOfMonth: Infinity };
-  
+
     const filtered = userListData.filter((item) => {
       const matchId = id ? item.discord_id.includes(id) : true;
       const matchName = name ? item.discord_name.includes(name) : true;
       const matchPayment = payment === 'all' || payment.toUpperCase() === item.payment.toUpperCase();
       const matchDate = startOfMonth <= item.createAt && item.createAt <= endOfMonth;
-  
+
       return matchId && matchName && matchPayment && matchDate;
     });
-  
+
     let sortedData = [...filtered];
-  
+
     if (selectType !== 'none' && sortType !== 'none') {
       const sortKey = selectType as keyof Pick<Detail, 'createAt' | 'quantity' | 'amount'>;
       const sortOrder = sortType === 'ascending' ? 1 : -1;
-  
+
       sortedData.sort((a, b) => (a[sortKey] - b[sortKey]) * sortOrder);
     }
-  
+
     setFilterUserListData(sortedData);
     setSearchLoading(false);
+  };
+
+  const handleModifyDetail = (values: DetailModify) => {
+    const timestamp = Math.floor(new Date(values.createTime).getTime() / 1000);
+    const updatedData = filterUserListData.map((detail) =>
+      detail._id === values._id
+        ? {
+            ...detail,
+            discord_name: values.name,
+            createAt: timestamp,
+            payment: values.payment,
+            amount: Number(values.amount),
+            quantity: Number(values.quantity),
+          }
+        : detail
+    );
+    setFilterUserListData(updatedData);
   };
 
   return (
@@ -205,7 +222,7 @@ const DetailManage = () => {
       <Flex justify='flex-start' align='center' style={{ width: '100%' }}>
         <Button color="default" variant="outlined" icon={<ReloadOutlined />} onClick={() => refreshData()}>刷新表格</Button>
       </Flex>
-      <DetailTable data={filterUserListData} isLoading={isLoading} />
+      <DetailTable data={filterUserListData} isLoading={isLoading} handleModifyDetail={handleModifyDetail}/>
     </Flex>
 
   )

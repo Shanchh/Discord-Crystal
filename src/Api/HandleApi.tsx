@@ -9,3 +9,13 @@ export const get_all_detail_lists = async () => {
         throw err;
     }
 }
+
+export const modify_detail = async (values: any) => {
+    try {
+        const res = await axios.post("/monthly/modify_detail", { values });
+        return res.data;
+    }
+    catch (err) {
+        throw err;
+    }
+}

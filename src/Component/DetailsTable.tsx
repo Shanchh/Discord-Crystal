@@ -1,15 +1,18 @@
-import { Avatar, Empty, Table, type TableProps } from 'antd'
+import { Avatar, Empty, Flex, Table, type TableProps } from 'antd'
 import React, { useState } from 'react'
-import { Detail } from '../../types';
+import { Detail, DetailModify } from '../../types';
+import ModifyDetailBtn from './ModifyDetailBtn';
+import DeleteDetailBtn from './DeleteDetailBtn';
 
 interface DetailsTableProps {
     data: Detail[];
     isLoading: boolean;
+    handleModifyDetail : (values: DetailModify) => void;
 }
 
 type TableRowSelection<T extends object = object> = TableProps<T>['rowSelection'];
 
-const DetailTable: React.FC<DetailsTableProps> = ({ data, isLoading }) => {
+const DetailTable: React.FC<DetailsTableProps> = ({ data, isLoading, handleModifyDetail }) => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
     const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
@@ -45,7 +48,7 @@ const DetailTable: React.FC<DetailsTableProps> = ({ data, isLoading }) => {
             align: 'center',
             width: 120,
             render: (data: Detail) => (
-                <Avatar src={data.avatar}/>
+                <Avatar src={data.avatar} />
             )
         },
         {
@@ -71,7 +74,7 @@ const DetailTable: React.FC<DetailsTableProps> = ({ data, isLoading }) => {
                 const date = new Date(timestamp * 1000);
                 return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
             },
-            width: 270
+            width: 200
         },
         {
             title: '月數',
@@ -93,6 +96,16 @@ const DetailTable: React.FC<DetailsTableProps> = ({ data, isLoading }) => {
             key: 'payment',
             align: 'center',
         },
+        {
+            title: "操作",
+            align: "center",
+            render: (data: Detail) => (
+                <Flex gap={10} justify="center" align="center">
+                    <ModifyDetailBtn data={data} handleModifyDetail={handleModifyDetail}/>
+                    <DeleteDetailBtn />
+                </Flex>
+            )
+        }
     ];
 
     const [pageSize, setPageSize] = useState(20);
