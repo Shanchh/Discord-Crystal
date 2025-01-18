@@ -1,4 +1,4 @@
-import { Avatar, Table, type TableProps } from 'antd'
+import { Avatar, Empty, Table, type TableProps } from 'antd'
 import React, { useState } from 'react'
 import { Detail } from '../../types';
 
@@ -53,12 +53,14 @@ const DetailTable: React.FC<DetailsTableProps> = ({ data, isLoading }) => {
             dataIndex: 'discord_name',
             key: 'discord_name',
             align: 'center',
+            width: 360
         },
         {
             title: 'ID',
             dataIndex: 'discord_id',
             key: 'discord_id',
             align: 'center',
+            width: 360
         },
         {
             title: '訂閱日期',
@@ -69,18 +71,21 @@ const DetailTable: React.FC<DetailsTableProps> = ({ data, isLoading }) => {
                 const date = new Date(timestamp * 1000);
                 return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
             },
+            width: 270
         },
         {
             title: '月數',
             dataIndex: 'quantity',
             key: 'quantity',
             align: 'center',
+            width: 100
         },
         {
             title: '金額',
             dataIndex: 'amount',
             key: 'amount',
             align: 'center',
+            width: 100
         },
         {
             title: '付款方式',
@@ -90,8 +95,8 @@ const DetailTable: React.FC<DetailsTableProps> = ({ data, isLoading }) => {
         },
     ];
 
-    const [pageSize, setPageSize] = useState(10);
-    const rowHeight = 50;
+    const [pageSize, setPageSize] = useState(20);
+    const rowHeight = 60;
 
     return (
         <Table
@@ -102,14 +107,14 @@ const DetailTable: React.FC<DetailsTableProps> = ({ data, isLoading }) => {
                     ),
                 },
             }}
-            scroll={{ x: 'max-content', y: '65vh' }}
+            scroll={{ x: 'max-content', y: 495 }}
             rowSelection={rowSelection}
             columns={columns}
             dataSource={data}
             pagination={{
                 position: ['bottomLeft'],
                 pageSize: pageSize,
-                pageSizeOptions: ['10', '20', '50', '100', '9999'],
+                pageSizeOptions: ['20', '50', '100', '9999'],
                 showSizeChanger: true,
                 onShowSizeChange: (_, size) => setPageSize(size),
             }}
@@ -118,6 +123,7 @@ const DetailTable: React.FC<DetailsTableProps> = ({ data, isLoading }) => {
             })}
             rowKey={(record) => record._id}
             loading={isLoading}
+            locale={{ emptyText: <Empty description="沒有明細" /> }}
         />
     )
 }
