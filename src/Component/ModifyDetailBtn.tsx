@@ -26,13 +26,13 @@ const ModifyDetailBtn: React.FC<ModifyDetailBtnProps> = ({ data, handleModifyDet
         modify_detail(values)
             .then(() => {
                 handleModifyDetail(values);
+                message.success("修改明細成功！")
             })
             .catch(() => {
                 message.error("修改明細失敗！")
             })
             .finally(() => {
                 setModal1Open(false);
-                message.success("修改明細成功！")
             })
     };
 
