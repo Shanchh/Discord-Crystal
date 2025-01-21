@@ -45,7 +45,7 @@ def modify_detail():
                 "createAt": int(datetime.strptime(values["createTime"], "%Y-%m-%d").timestamp()),
                 "amount": int(values["amount"]),
                 "quantity": int(values["quantity"]),
-                "payment": int(values["payment"])
+                "payment": values["payment"]
             }
         }
         modify_result = db["Monthly-Details"].update_one(query, update)
