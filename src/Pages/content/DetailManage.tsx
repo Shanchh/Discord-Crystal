@@ -127,16 +127,20 @@ const DetailManage = () => {
     const updatedData = filterUserListData.map((detail) =>
       detail._id === values._id
         ? {
-            ...detail,
-            discord_name: values.name,
-            createAt: timestamp,
-            payment: values.payment,
-            amount: Number(values.amount),
-            quantity: Number(values.quantity),
-          }
+          ...detail,
+          discord_name: values.name,
+          createAt: timestamp,
+          payment: values.payment,
+          amount: Number(values.amount),
+          quantity: Number(values.quantity),
+        }
         : detail
     );
     setFilterUserListData(updatedData);
+  };
+
+  const handleDelete = (id: string) => {
+    setFilterUserListData(filterUserListData.filter(detail => detail._id !== id));
   };
 
   return (
@@ -222,7 +226,7 @@ const DetailManage = () => {
       <Flex justify='flex-start' align='center' style={{ width: '100%' }}>
         <Button color="default" variant="outlined" icon={<ReloadOutlined />} onClick={() => refreshData()}>刷新表格</Button>
       </Flex>
-      <DetailTable data={filterUserListData} isLoading={isLoading} handleModifyDetail={handleModifyDetail}/>
+      <DetailTable data={filterUserListData} isLoading={isLoading} handleModifyDetail={handleModifyDetail} handleDelete={handleDelete}/>
     </Flex>
 
   )

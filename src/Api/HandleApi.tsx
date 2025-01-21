@@ -19,3 +19,13 @@ export const modify_detail = async (values: any) => {
         throw err;
     }
 }
+
+export const delete_detail = async (id: string) => {
+    try {
+        const res = await axios.post("/monthly/delete_detail", { id });
+        return res.data;
+    }
+    catch (err) {
+        throw err;
+    }
+}

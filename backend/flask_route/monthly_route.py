@@ -57,3 +57,27 @@ def modify_detail():
 
     except Exception as e:
         return jsonify({"Error": str(e)}), 404
+    
+@monthly_api.route("/delete_detail", methods=["POST"])
+def delete_detail():
+    try:
+        data: dict = request.get_json()
+        id = data["id"]
+
+        collection = db["Monthly-Details"]
+        detail = collection.find_one({"_id": ObjectId(id)})
+
+        if not detail:
+            return jsonify({"message": "NotFound"}), 404
+        
+        collection.delete_one({"_id": ObjectId(id)})
+
+        result = {
+            'code': 0,
+            'message': f"成功刪除帳號"
+        }
+
+        return result
+
+    except Exception as e:
+        return jsonify({"Error": str(e)}), 404

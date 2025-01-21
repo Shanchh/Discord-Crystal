@@ -8,11 +8,12 @@ interface DetailsTableProps {
     data: Detail[];
     isLoading: boolean;
     handleModifyDetail : (values: DetailModify) => void;
+    handleDelete: (id: string) => void;
 }
 
 type TableRowSelection<T extends object = object> = TableProps<T>['rowSelection'];
 
-const DetailTable: React.FC<DetailsTableProps> = ({ data, isLoading, handleModifyDetail }) => {
+const DetailTable: React.FC<DetailsTableProps> = ({ data, isLoading, handleModifyDetail, handleDelete }) => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
     const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
@@ -102,7 +103,7 @@ const DetailTable: React.FC<DetailsTableProps> = ({ data, isLoading, handleModif
             render: (data: Detail) => (
                 <Flex gap={10} justify="center" align="center">
                     <ModifyDetailBtn data={data} handleModifyDetail={handleModifyDetail}/>
-                    <DeleteDetailBtn />
+                    <DeleteDetailBtn data={data} handleDelete={handleDelete}/>
                 </Flex>
             )
         }
