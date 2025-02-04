@@ -64,15 +64,15 @@ const SubUsersTable: React.FC<SubUsersTableProps> = ({ data, isLoading }) => {
         },
         {
             title: '總訂閱月數',
-            dataIndex: 'total_amount',
-            key: 'total_amount',
+            dataIndex: 'total_quantity',
+            key: 'total_quantity',
             align: 'center',
             width: 110
         },
         {
             title: '總訂閱金額',
-            dataIndex: 'total_quantity',
-            key: 'total_quantity',
+            dataIndex: 'total_amount',
+            key: 'total_amount',
             align: 'center',
             width: 110
         },
