@@ -17,3 +17,14 @@ export interface DetailModify {
     quantity: string;
     amount: string;
 }
+
+export interface UserData {
+    _id: string,
+    avatar: string,
+    discord_id: string,
+    discord_name: string,
+    createAt: number,
+    is_active: boolean,
+    total_amount: number,
+    total_quantity: number,
+}

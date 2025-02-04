@@ -81,3 +81,36 @@ def delete_detail():
 
     except Exception as e:
         return jsonify({"Error": str(e)}), 404
+    
+@monthly_api.route("/get_all_user_data", methods=["GET"])
+def get_all_user_data():
+    try:
+        user_list = monthly.get_all_subscriber_user()
+        collection = db["Monthly-Details"]
+
+        for user in user_list:
+            discord_id = user["discord_id"]
+
+            aggregation_result = list(collection.aggregate([
+                {"$match": {"discord_id": discord_id}},
+                {"$group": {
+                    "_id": "$discord_id",
+                    "total_amount": {"$sum": "$amount"},
+                    "total_quantity": {"$sum": "$quantity"}
+                }}
+            ]))
+
+            if aggregation_result:
+                user["total_amount"] = aggregation_result[0]["total_amount"]
+                user["total_quantity"] = aggregation_result[0]["total_quantity"]
+            else:
+                user["total_amount"] = 0
+                user["total_quantity"] = 0
+
+        result = {
+            "message": "ok",
+            "data": user_list
+        }
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"Error": str(e)}), 404

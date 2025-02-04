@@ -29,3 +29,13 @@ export const delete_detail = async (id: string) => {
         throw err;
     }
 }
+
+export const get_all_user_data = async () => {
+    try {
+        const res = await axios.get("/monthly/get_all_user_data");
+        return res.data.data;
+    }
+    catch (err) {
+        throw err;
+    }
+}
