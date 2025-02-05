@@ -114,3 +114,22 @@ def get_all_user_data():
         return jsonify(result), 200
     except Exception as e:
         return jsonify({"Error": str(e)}), 404
+    
+@monthly_api.route("/get_statistics", methods=["POST"])
+def get_statistics():
+    try:
+        data: dict = request.get_json()
+        value = data["value"]
+        
+        stats = {
+            "total_amount": monthly.get_statistics()[0],
+            "total_quantity": monthly.get_statistics()[1]
+        }
+
+        if value in stats:
+            return jsonify({"message": "ok", "data": stats[value]}), 200
+        
+        return jsonify({"message": "error", "error": "Invalid value."}), 400
+
+    except Exception as e:
+        return jsonify({"Error": str(e)}), 404

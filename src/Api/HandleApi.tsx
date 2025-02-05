@@ -39,3 +39,13 @@ export const get_all_user_data = async () => {
         throw err;
     }
 }
+
+export const get_statistics = async (value: string) => {
+    try {
+        const res = await axios.post("/monthly/get_statistics", { value });
+        return res.data.data;
+    }
+    catch (err) {
+        throw err;
+    }
+}
