@@ -88,30 +88,26 @@ def get_all_user_data():
         user_list = monthly.get_all_subscriber_user()
         collection = db["Monthly-Details"]
 
+        discord_ids = [user["discord_id"] for user in user_list]
+
+        aggregation_result = collection.aggregate([
+            {"$match": {"discord_id": {"$in": discord_ids}}},
+            {"$group": {
+                "_id": "$discord_id",
+                "total_amount": {"$sum": "$amount"},
+                "total_quantity": {"$sum": "$quantity"}
+            }}
+        ])
+
+        user_totals = {result["_id"]: result for result in aggregation_result}
+
         for user in user_list:
             discord_id = user["discord_id"]
+            user_data = user_totals.get(discord_id, {"total_amount": 0, "total_quantity": 0})
+            user["total_amount"] = user_data["total_amount"]
+            user["total_quantity"] = user_data["total_quantity"]
 
-            aggregation_result = list(collection.aggregate([
-                {"$match": {"discord_id": discord_id}},
-                {"$group": {
-                    "_id": "$discord_id",
-                    "total_amount": {"$sum": "$amount"},
-                    "total_quantity": {"$sum": "$quantity"}
-                }}
-            ]))
-
-            if aggregation_result:
-                user["total_amount"] = aggregation_result[0]["total_amount"]
-                user["total_quantity"] = aggregation_result[0]["total_quantity"]
-            else:
-                user["total_amount"] = 0
-                user["total_quantity"] = 0
-
-        result = {
-            "message": "ok",
-            "data": user_list
-        }
-        return jsonify(result), 200
+        return jsonify({"message": "ok", "data": user_list}), 200
     except Exception as e:
         return jsonify({"Error": str(e)}), 404
     
