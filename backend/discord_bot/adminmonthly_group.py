@@ -109,6 +109,11 @@ async def check_existing(interaction: discord.Interaction):
             await member.add_roles(role)
             await channel.send(embed = bm.basic("添加缺失身分組", f"已為活躍用戶 {member.mention} 添加角色 '{role.name}'\n到期日: {member['dateDeadLine']}", 0x00ff11))
 
+    # 整理資料庫身分組活躍狀態
+    role = guild.get_role(MONTHLY_ROLE_ID)
+    update_count = monthly.refresh_users_active_status(role.members)
+    await channel.send(embed = bm.basic("資料庫活躍狀態", f"已調整 {update_count} 筆資料", 0x00ff11))
+
     await channel.send(embed = bm.basic("核實身分組存在狀況", "執行完畢！", 0x00ff11))
 
 @is_owner()

@@ -199,6 +199,26 @@ def get_active_user():
             })
     return result
 
+def refresh_users_active_status(members_with_role):
+    """整理資料庫身分組活躍狀態"""
+    user_list = get_all_subscriber_user()
+    active_ids = [member.id for member in members_with_role]
+
+    collection = db["Monthly-Users"]
+
+    update_count = 0
+    for user in user_list:
+        user_id = int(user["discord_id"])
+        new_status = user_id in active_ids
+        if user["is_active"] != new_status:
+            collection.update_one(
+                {"discord_id": str(user_id)},
+                {"$set": {"is_active": new_status}}
+            )
+            update_count += 1
+
+    return update_count
+
 def objectid_trans_string(data_list):
     for data in data_list:
         data["_id"] = str(data["_id"])
