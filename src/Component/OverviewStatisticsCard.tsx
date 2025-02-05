@@ -31,7 +31,7 @@ const OverviewStatisticsCard: React.FC<OverviewStatisticsCardProps> = ({ value, 
                     {isLoading ? (
                         <Spin size="large" />
                     ) : (
-                        showValue + " " + unitName
+                        showValue.toLocaleString() + " " + unitName
                     )}
                 </h1>
             </Flex>
